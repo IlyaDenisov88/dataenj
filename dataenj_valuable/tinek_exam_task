@@ -1,0 +1,96 @@
+drop table if exists book; 
+create table book as 
+(
+select 
+    '123' as book_id
+   ,'234' as genre_id
+   ,'345' as author_id
+   ,'To Kill a Mockingbird' as book_title
+   ,'1962-01-01'::date as publication_year
+   ,160 as page_count
+   ,'English' as language
+UNION ALL
+select 
+    '234' as book_id
+   ,'345' as genre_id
+   ,'456' as author_id
+   ,'Die Verwandlung' as book_title
+   ,'1915-01-01'::date as publication_year
+   ,80 as page_count
+   ,'German' as language 
+UNION ALL
+select 
+    '345' as book_id
+   ,'456' as genre_id
+   ,'567' as author_id
+   ,'The Girl on the Train' as book_title
+   ,'2015-01-01'::date as publication_year
+   ,336 as page_count
+   ,'English' as language 
+
+
+);
+
+
+
+drop table if exists author; 
+create table author as 
+(
+select 
+    '345' as author_id
+   ,'Harper Lee' as author_name
+   ,'1926-04-28'::date as birth_year
+   ,'Monroeville' as birth_city
+UNION ALL
+select 
+    '456' as author_id
+   ,'Franz Kafka' as author_name
+   ,'1883-07-03'::date as birth_year
+   ,'Prague' as birth_city
+
+
+UNION ALL
+select 
+    '567' as author_id
+   ,'Paula Hawkins' as author_name
+   ,'1972-08-26'::date as birth_year
+   ,'Salisbury' as birth_city
+   
+);
+
+drop table if exists genre; 
+create table genre as 
+(
+select 
+    '234' as genre_id
+   ,'Fiction' as genre_name
+UNION ALL
+select 
+    '345' as genre_id
+   ,'Surrealism' as genre_name
+UNION ALL
+select 
+    '456' as genre_id
+   ,'Mystery' as genre_name
+);
+
+SELECT author_name FROM author
+WHERE birth_city IN ('Prague', 'Salisbury') AND 
+author_id IN (SELECT author_id FROM book WHERE language NOT IN ('English'));
+
+SELECT book_title 
+FROM book
+WHERE page_count >= 100 AND
+      publication_year >= '2010-01-01' AND
+      author_id IN (SELECT author_id FROM author WHERE birth_year < '1980-01-01');
+
+SELECT g.genre_name FROM genre g 
+WHERE g.genre_id IN
+(SELECT b.genre_id FROM book b
+WHERE b.publication_year >= '2002-01-01'
+GROUP BY b.genre_id
+ORDER BY count(*) DESC
+LIMIT 1);
+
+
+

@@ -1,0 +1,110 @@
+-- HDFS DFS основные команды
+
+hdfs dfs -mkdir: 
+	Создает новый каталог в HDFS. 
+	Пример: hdfs dfs -mkdir /de_course
+
+ Если не хватает прав у текущего пользователя, команда приобретает вид: sudo -u hdfs hdfs dfs -mkdir /de_course и создаст папку в корневом каталоге.    
+
+sudo -u hdfs hdfs dfs -chown cloudera:supergroup /de_course/  
+	Изменение владельца и группу каталога, чтобы пользователь cloudera имел права на запись.
+
+hdfs dfs -ls: 
+	Эта команда без указания конкретного пути покажет содержимое текущего пользователя HDFS.  hdfs dfs -ls /  Эта команда покажет содержимое корневого каталога HDFS. Вывод будет включать все файлы и
+	каталоги, находящиеся непосредственно в корневом каталоге (/) HDFS.
+	
+	
+Создадим локальный файлик de.txt для дальнейших примеров, для этого выполним команду: echo "Это пример файла для HDFS" > de.txt
+
+hdfs dfs -put: 
+	Копирует файлы или каталоги из локальной файловой системы в HDFS. 
+	Пример: hdfs dfs -put de.txt /de_course (копирование файла "de.txt" в HDFS под именем "de.txt"). 
+hdfs dfs -put de.txt /de_course/de_hdfs.txt 
+	(копирование файла "de.txt" в HDFS под именем "de_hdfs.txt").
+
+hdfs dfs -cat: 
+	Выводит содержимое файла в HDFS. Пример: hdfs dfs -cat /de_course/de_hdfs.txt (вывод содержимого файла "de_hdfs.txt" в HDFS).
+
+hdfs dfs -get: 
+	Копирует файлы или каталоги из HDFS в локальную файловую систему. 
+	Пример: hdfs dfs -get /de_course/de_hdfs.txt . 
+	(копирование файла "de.txt" из HDFS в локальную файловую систему под именем "de_hdfs.txt"). 
+	Здесь . означает текущий локальный каталог. Вы также можете указать конкретный путь для сохранения файла
+
+hdfs dfs -mv: 
+	Перемещение или переименование файла или каталога в HDFS. 
+	Пример: hdfs dfs -mv /de_course/de.txt /de_course/de_rename.txt 
+	Здесь /de_course/de.txt: Путь к исходному файлу в HDFS, который вы хотите переместить или переименовать. 
+	/de_course/de_rename.txt: Новый путь или новое имя для файла в HDFS.  
+	Если новый путь указывает на тот же каталог, команда переименует файл de.txt в de_rename.txt в каталоге /de_course/.
+	Если новый путь указывает на другой каталог, команда переместит файл de.txt в указанный каталог и при этом
+	переименует его в de_rename.txt.
+
+
+hdfs dfs -rm: 
+	Удаляет файлы из HDFS. 
+	Пример: hdfs dfs -rm /de_course/de.txt (удаление файла "de.txt" из HDFS). 
+	hdfs dfs -rm -r удаляет каталоги - hdfs dfs -rm -r /de_course/
+	(Каталог для удаления требует особые права)
+	
+hdfs dfs -du: 
+	Отображает информацию о размере файлов и каталогов в HDFS. 
+	Пример: sudo -u hdfs hdfs dfs -du / (отображение размера файлов и каталогов в корневом каталоге  HDFS). 
+	Тут необходимы особые права из за предустановленного образа, поэтому снова через sudo
+	
+В отличии от версии HDFS можно менять hdfs dfs на hadoop fs, разницы никакой нет, разве, что в синтаксисе.
+
+Для получения списка доступных команд, введите hdfs dfs или hadoop fs и нажмите Enter:
+
+	Usage: hadoop fs [generic options]
+	  [-appendToFile <localsrc> ... <dst>]
+	  [-cat [-ignoreCrc] <src> ...]
+	  [-checksum <src> ...]
+	  [-chgrp [-R] GROUP PATH...]
+	  [-chmod [-R] <MODE[,MODE]... | OCTALMODE> PATH...]
+	  [-chown [-R] [OWNER][:[GROUP]] PATH...]
+	  [-copyFromLocal [-f] [-p] [-l] <localsrc> ... <dst>]
+	  [-copyToLocal [-p] [-ignoreCrc] [-crc] <src> ... <localdst>]
+	  [-count [-q] [-h] [-v] [-x] <path> ...]
+	  [-cp [-f] [-p | -p[topax]] <src> ... <dst>]
+	  [-createSnapshot <snapshotDir> [<snapshotName>]]
+	  [-deleteSnapshot <snapshotDir> <snapshotName>]
+	  [-df [-h] [<path> ...]]
+	  [-du [-s] [-h] [-x] <path> ...]
+	  [-expunge]
+	  [-find <path> ... <expression> ...]
+	  [-get [-p] [-ignoreCrc] [-crc] <src> ... <localdst>]
+	  [-getfacl [-R] <path>]
+	  [-getfattr [-R] {-n name | -d} [-e en] <path>]
+	  [-getmerge [-nl] <src> <localdst>]
+	  [-help [cmd ...]]
+	  [-ls [-C] [-d] [-h] [-q] [-R] [-t] [-S] [-r] [-u] [<path> ...]]
+	  [-mkdir [-p] <path> ...]
+	  [-moveFromLocal <localsrc> ... <dst>]
+	  [-moveToLocal <src> <localdst>]
+	  [-mv <src> ... <dst>]
+	  [-put [-f] [-p] [-l] <localsrc> ... <dst>]
+	  [-renameSnapshot <snapshotDir> <oldName> <newName>]
+	  [-rm [-f] [-r|-R] [-skipTrash] <src> ...]
+	  [-rmdir [--ignore-fail-on-non-empty] <dir> ...]
+	  [-setfacl [-R] [{-b|-k} {-m|-x <acl_spec>} <path>]|[--set <acl_spec> <path>]]
+	  [-setfattr {-n name [-v value] | -x name} <path>]
+	  [-setrep [-R] [-w] <rep> <path> ...]
+	  [-stat [format] <path> ...]
+	  [-tail [-f] <file>]
+	  [-test -[defsz] <path>]
+	  [-text [-ignoreCrc] <src> ...]
+	  [-touchz <path> ...]
+	  [-usage [cmd ...]]
+
+	Generic options supported are
+	-conf <configuration file>     specify an application configuration file
+	-D <property=value>            use value for given property
+	-fs <local|namenode:port>      specify a namenode
+	-jt <local|resourcemanager:port>    specify a ResourceManager
+	-files <comma separated list of files>    specify comma separated files to be copied to the map reduce cluster
+	-libjars <comma separated list of jars>    specify comma separated jar files to include in the classpath.
+	-archives <comma separated list of archives>    specify comma separated archives to be unarchived on the compute machines.
+
+	The general command line syntax is
+	bin/hadoop command [genericOptions] [commandOptions]

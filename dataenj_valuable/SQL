@@ -1,0 +1,690 @@
+CREATE TABLE positions 
+(id INT PRIMARY KEY,
+title VARCHAR,
+salary INT
+);
+CREATE TABLE persons
+(id INT PRIMARY KEY,
+name VARCHAR,
+position_id INT,
+FOREIGN KEY (position_id) REFERENCES positions(id)
+);
+INSERT INTO positions (id, title, salary) VALUES
+	(1,'Программист', 1500),
+	(2, 'Юрист', 700),
+	(3, 'HR', 700),
+	(4, 'Дизайнер', 700),
+	(5, 'Маркетолог', 500),
+	(6, 'Data Engineer', 3000);
+
+INSERT INTO persons (id, name, position_id) VALUES
+	('1', 'Владимир', '4'),
+	('2', 'Алёна', '1'),
+	('3', 'Евгений', '5'),
+	('4', 'Артём', '2'),
+	('5', 'Борис', '4'),
+	('6', 'Татьяна', '3');
+
+SELECT * FROM positions;
+
+SELECT * 
+FROM positions
+LIMIT 3;
+
+SELECT title
+FROM positions;
+
+SELECT title
+FROM positions
+WHERE salary > 1000;
+
+SELECT title, salary
+FROM positions
+WHERE title = 'HR';
+
+SELECT title
+FROM positions
+WHERE title LIKE '%Data%';
+
+SELECT title
+FROM positions
+WHERE title LIKE '_рограммис_';
+
+SELECT title
+FROM positions
+WHERE title NOT LIKE '%р';
+
+#экранирование
+SELECT title
+FROM positions 
+WHERE title LIKE '25#%' ESCAPE '#';
+
+#альтернативно в PostgeSQL
+SELECT title
+FROM positions 
+WHERE title LIKE '25\%';
+
+SELECT DISTINCT salary
+FROM positions;
+
+SELECT DISTINCT (salary, title)
+FROM positions; --DISTINCT замедляет и оставит один NULL(если они есть)'''
+
+--возможная альтернатива DISTINCT - GROUP BY по всем колонкам'''
+
+--алиас - псевдоним к получаемым данным'''
+SELECT * FROM positions p;
+
+
+
+--count(*) подсчитывает все строки вместе с NULL
+--count("column_name") подсчитывает только те строки, где "column_name" не NULL (поэтому записи со значениями NULL не подсчитываются)'''
+SELECT COUNT(DISTINCT salary) AS new_column
+FROM positions;
+
+SELECT MIN(salary), AVG(salary), MAX(salary), SUM(salary), ABS(salary)
+FROM positions;
+
+SELECT * 
+FROM positions
+ORDER BY salary;
+
+SELECT * 
+FROM positions
+ORDER BY salary DESC;
+
+SELECT * 
+FROM positions
+ORDER BY title;
+
+SELECT * 
+FROM positions
+ORDER BY salary DESC
+LIMIT 3;
+
+
+CREATE TABLE customers 
+(customer_id INT PRIMARY KEY,
+name VARCHAR,
+email VARCHAR
+);
+
+CREATE TABLE products
+(product_id INT PRIMARY KEY,
+product_name VARCHAR,
+price_per_unit DECIMAL(5, 2)
+);
+CREATE TABLE orders
+(order_id INT PRIMARY KEY,
+order_date DATE,
+customer_id INT,
+product_id INT,
+quantity INT,
+FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+--DECIMAL - тип данных для записи числовых значений с фиксированной точностью. 
+--Для использования этого типа в скобках можно указать количество цифр в числе вообще, 
+--и  количество знаков после точки. К примеру если задать число таким образом DECIMAL(3,2), 
+--то максимальное число, которое можно будет сохранить в ячейку с такими ограничениями будет
+--от -9.99 до 9.99 включительно. Если не указывать ограничения, число будет сохраняться точно как написано.
+
+--DATE - тип данных для сохранения дата без временной части. 
+--Дату удобно задавать в формате YYYY-MM-DD («2024-06-30»). '''
+
+
+-- Вставляем данные в таблицу "customers" с новыми значениями customer_id
+INSERT INTO customers (customer_id, name, email) VALUES
+    (101, 'Иван Иванов', 'ivanov@mymail.tu'),
+    (102, 'Петр Петров', 'petrov@mymail.tu'),
+    (103, 'Максим Максимов', 'maximov@mymail.tu'),
+    (104, 'Алексей Алексеев', 'alexeev@mymail.tu');
+
+-- Вставляем данные в таблицу "products"
+INSERT INTO products (product_id,product_name, price_per_unit) VALUES
+    (1,'Флешка', 10.00),
+    (2,'Клавиатура', 15.00),
+    (3,'Наушники', 20.00);
+
+-- Вставляем данные в таблицу "orders"
+INSERT INTO orders (order_id, order_date, customer_id, product_id, quantity) 
+VALUES
+    (1, '2024-05-01', 101, 1, 1),
+    (2, '2024-05-01', 102, 2, 1),
+    (3, '2024-05-01', 103, 3, 1),
+    (4, '2024-05-01', 104, 1, 3),
+    (5, '2024-05-01', 101, 2, 1),
+    (6, '2024-05-02', 101, 1, 1),
+    (7, '2024-05-02', 102, 2, 2),
+    (8, '2024-05-02', 103, 3, 1),
+    (9, '2024-05-02', 104, 1, 1),
+    (10, '2024-05-02', 101, 2, 2),
+    (11, '2024-05-03', 101, 1, 1),
+    (12, '2024-05-03', 102, 2, 2),
+    (13, '2024-05-03', 103, 3, 1),
+    (14, '2024-05-03', 104, 1, 4),
+    (15, '2024-05-03', 101, 2, 1),
+    (16, '2024-05-04', 101, 1, 1),
+    (17, '2024-05-04', 102, 2, 1),
+    (18, '2024-05-04', 103, 3, 1),
+    (19, '2024-05-04', 104, 1, 1),
+    (20, '2024-05-04', 101, 2, 1);
+
+SELECT  product_id, sum(quantity) AS total_quantity
+FROM orders
+GROUP BY product_id;
+
+SELECT  product_id, order_date, sum(quantity) AS total_quantity
+FROM orders
+GROUP BY (product_id, order_date)
+ORDER BY (order_date, product_id);
+--порядок указания операторов имеет значение: сначала указывается оператор GROUP BY, а затем оператор ORDER BY;
+
+--GROUP BY: Группирует строки по значениям одного или нескольких столбцов.
+--HAVING: Фильтрует группы, созданные GROUP BY, на основе условий, содержащих агрегатные функции.
+
+SELECT  product_id, order_date, sum(quantity) AS total_quantity
+FROM orders
+GROUP BY (product_id, order_date)
+HAVING sum(quantity) > 2 
+ORDER BY (order_date, product_id);
+
+-- Why not HAVING total_quantity > 2.
+-- The issue arises because total_quantity is defined in the SELECT clause, which runs after the HAVING clause. 
+-- At the time the HAVING clause is evaluated, total_quantity hasn't been calculated yet 1.
+
+
+-- DISTINCT запишет только первых (по сутиникакая инфа о данных не сохранится)ю Работает быстрее. (сплюснули)
+-- GROUP BY берет и информацию о тех, кто сзади, для агр функций. (сложили по колодам)
+
+
+
+
+SELECT title, salary
+FROM positions
+WHERE salary IN (SELECT max(salary) FROM positions);
+
+-- посчитали у скольких людей больше 5 заказов(orders) и получили имена из таблицы customers
+SELECT name, email
+FROM customers
+WHERE (SELECT COUNT(*) FROM orders WHERE orders.customer_id = customers.customer_id) > 5;
+
+-- посчитали сколько заказов сделал ИВАН ИВАНОВ
+SELECT count(*)
+FROM orders
+WHERE customer_id IN (SELECT customer_id FROM customers WHERE customers.name = 'Иван Иванов');
+
+
+--сравнить цены нашего магазина со средними
+SELECT product_id, product_name, price_per_unit,
+    (SELECT AVG(price_per_unit)FROM products) AS avg_price,
+	price_per_unit - (SELECT AVG(price_per_unit)FROM products) AS price_difference
+FROM products;
+
+
+--использование подзапросов в операторе FROM. есть одно условие: 
+--результату подзапроса обязательно нужно назначить псевдоним. 
+--Если не задать псевдоним, то возникнет ошибка. 
+--Псевдоним назначается уже привычным способом используя оператор AS.
+
+-- Пример такой - необходимо вывести максимальное количество товара с product_id =2 в одном заказе по дням. 
+-- Не максимальное количество за день, а сколько единиц товара с данным id заказывали в одном заказе максимально.
+SELECT subquery.product_id, subquery.order_date, MAX(subquery.quantity) AS max_quantity_per_day
+FROM (SELECT product_id,order_date,quantity FROM orders WHERE product_id = 2) AS subquery
+GROUP BY subquery.product_id, subquery.order_date;
+
+-- Напишите запрос для выбора всех заказов, где количество товаров больше среднего количества товаров всех заказов. 
+-- В результатах должны быть order_id, customer_id, product_id и quantity.
+SELECT order_id, customer_id, product_id, quantity
+FROM orders
+WHERE quantity > (SELECT avg(quantity) FROM orders);
+
+-- Напишите запрос для выбора всех заказов, где товар имеет цену более 10.00. 
+-- В результатах должны быть order_id, customer_id, product_id, quantity.
+SELECT order_id, customer_id, product_id, quantity 
+FROM orders
+WHERE product_id IN (SELECT product_id FROM products WHERE price_per_unit > 10.00);
+
+-- Напишите запрос для выбора заказов, где количество товаров выше среднего количества товаров для каждого клиента. 
+-- В результатах должны быть order_id, customer_id, product_id, quantity. Аналитики разбушевались)))
+SELECT order_id, customer_id, product_id, quantity
+FROM orders
+WHERE quantity > (SELECT avg(quantity) FROM orders WHERE orders.customer_id = customer_id);
+
+
+-- UNION: Оператор UNION объединяет результаты SELECT запросов и 
+-- удаляет дубликаты строк из объединенного результирующего набора.
+
+-- UNION ALL: Оператор UNION ALL также объединяет результаты SELECT запросов, но не удаляет дубликаты строк. 
+-- Все строки из каждого запроса включаются в объединенный результирующий набор.
+
+-- UNION выполняет операцию сортировки для удаления дубликатов, 
+-- что может потребовать дополнительных ресурсов, в то время как UNION ALL не выполняет сортировку.
+
+-- статистика  инфосайта
+CREATE TABLE site_visit_log (
+    timestamp TIMESTAMP,
+    uniq_id INT
+);
+-- статистика  интернет-магазина
+CREATE TABLE shop_visit_log (
+    timestamp TIMESTAMP,
+    uniq_id INT
+);
+
+-- Заполняем таблицу "site_visit_log" данными
+INSERT INTO site_visit_log (timestamp, uniq_id) VALUES
+    ('2024-05-01 09:15:22', 123456),
+    ('2024-05-01 10:30:45', 234567),
+    ('2024-05-01 11:45:18', 345678),
+    ('2024-05-01 12:10:55', 456789),
+    ('2024-05-01 13:25:37', 567890),
+    ('2024-05-01 14:40:12', 678901),
+    ('2024-05-01 15:05:28', 789012),
+    ('2024-05-01 16:20:17', 890123),
+    ('2024-05-01 17:35:44', 901234),
+    ('2024-05-01 18:50:29', 123045),
+    ('2024-05-01 09:15:22', 123456),
+    ('2024-05-01 10:30:45', 234567),
+    ('2024-05-01 11:45:18', 345678),
+    ('2024-05-01 12:10:55', 456789),
+    ('2024-05-01 13:25:37', 567890),
+    ('2024-05-01 14:40:12', 678901),
+    ('2024-05-01 15:05:28', 789012),
+    ('2024-05-01 16:20:17', 890123),
+    ('2024-05-01 17:35:44', 901234),
+    ('2024-05-01 18:50:29', 123045);
+
+-- Заполняем таблицу "shop_visit_log" данными
+INSERT INTO shop_visit_log (timestamp, uniq_id) VALUES
+    ('2024-05-01 09:25:12', 234567),
+    ('2024-05-01 10:20:22', 345678),
+    ('2024-05-01 11:35:15', 456789),
+    ('2024-05-01 12:40:56', 567890),
+    ('2024-05-01 13:55:33', 678901),
+    ('2024-05-01 14:24:15', 789012),
+    ('2024-05-01 15:15:22', 890123),
+    ('2024-05-01 16:42:15', 901234),
+    ('2024-05-01 17:25:21', 123045),
+    ('2024-05-01 18:40:13', 234156),
+    ('2024-05-01 09:17:56', 234567),
+    ('2024-05-01 12:52:13', 345678),
+    ('2024-05-01 11:15:16', 456789),
+    ('2024-05-01 12:54:15', 567890),
+    ('2024-05-01 13:25:22', 678901),
+    ('2024-05-01 14:42:15', 789012),
+    ('2024-05-01 15:25:23', 890123),
+    ('2024-05-01 16:00:16', 901234),
+    ('2024-05-01 17:35:47', 123045),
+    ('2024-05-01 18:30:21', 234156);
+
+-- получить уникальные uniq_id - тут как раз задействуем UNION и получим действия с уникальными uniq_id 
+-- - это визиты разных людей и ширина охвата нашей аудитории обоими сайтами. (11 rows)
+SELECT uniq_id FROM site_visit_log
+UNION 
+SELECT uniq_id FROM shop_visit_log;
+
+-- получить список всех посещений - тут воспользуемся UNION ALL и получим общий список посещений. (40 rows)
+SELECT uniq_id FROM site_visit_log
+UNION ALL
+SELECT uniq_id FROM shop_visit_log;
+
+-- в основном оператор UNION ALL задействован при составлении сводных таблиц или витрин данных
+-- (об этом дальше на курсе). Когда необходимо объединить результаты однотипных запросов из разных источников
+-- в одной сводной таблице такой условный сбор исходных строк в одной консолидирующей таблице.
+
+-- Необходимо заметить что для работы этих операций нужны два условия:
+-- 1. В каждом запросе SELECT должно быть одинаковое кол-во столбцов
+-- 2. Типы данных в столбцах должны совпадать.
+-- 3. Первое название столбца (в верхнем SELECT) и будет названием итоговым названием колонки (можно поменять сверху за счет псевдонима)
+
+
+
+-- JOIN - сопоставление и соединение двух таблиц
+
+-- Различают несколько видов JOIN:
+-- INNER JOIN
+-- LEFT/RIGHT JOIN
+-- FULL JOIN
+-- CROSS JOIN
+
+-- Важно понимать и помнить, что JOIN  может использоваться для объединения более двух таблиц. 
+
+-- INNER JOIN возвращают все строки из нескольких таблиц, где выполняется условие соединения.
+SELECT persons.name, positions.title, positions.salary
+FROM persons
+INNER JOIN positions
+ON persons.position_id = positions.id;
+-- можно написать то же самое с использованием алиасов
+SELECT per.name, pos.title, pos.salary
+FROM persons per
+JOIN positions pos
+ON per.position_id = pos.id;
+
+--дабы убедиться, что только строки с равными id попали в join
+SELECT *
+FROM persons
+INNER JOIN positions
+ON persons.position_id = positions.id;
+
+-- LEFT/RIGHT JOIN. Эти виды JOIN классифицируются как внешние и вот почему. 
+-- Во внешних соединениях одна из используемых таблиц остается в своем неизменном виде,
+-- а из второй подставляются значения удовлетворяющие условиям. 
+
+-- все строки лефой таблицы(position) сохранены. К ним добавлены строки из правой(persons) по position_id.
+-- Для "Data Engineer" в persons нет записей => справа значения NULL.
+-- Также можно заметить, что в фирме работают 2 дизайнера, 
+-- и сопоставление происходит для каждого случая выполнения условия из запроса.
+SELECT *
+FROM positions LEFT JOIN persons
+ON positions.id = persons.position_id
+
+-- сейчас все люди с должностями. Добавим человека без должности, чтобы показать работу RIGHT JOIN.
+INSERT INTO persons (id, name, position_id) VALUES
+('7', 'Василиса', NULL);
+
+--RIGHT JOIN. Записи в правой таблице - приоритетны, остаются все. Левая ищется по совпадению.
+SELECT *
+FROM positions RIGHT JOIN persons
+ON positions.id = persons.position_id
+
+-- Запоминаем так: какое слово указано вместе с JOIN, та таблица и остается полностью в выдаче результатов запроса.
+
+-- FULL JOIN. Это как два в одном (LEFT+RIGHT)
+SELECT *
+FROM positions FULL JOIN persons
+ON positions.id = persons.position_id
+-- тут возникают null и слева и справа...
+
+-- CROSS JOIN. Концепция CROSS JOIN довольно проста. Он создает декартово произведение двух таблиц,
+-- то есть комбинирует каждую строку из одной таблицы с каждой строкой из другой таблицы. 
+-- Это значит, что каждая строка из первой таблицы будет объединена с каждой строкой из второй таблицы. 
+-- CROSS JOIN полезен, когда необходимо рассмотреть все возможные комбинации двух наборов данных. 
+-- Однако его следует использовать осторожно, так как результат может быть очень большим(произведение чисел строк)
+SELECT *
+FROM table1 CROSS JOIN table2;
+
+-- Multiple join
+-- Напишите верный запрос чтобы найти все заказы, сделанные клиентом с именем "Алексей Алексеев". 
+-- Результат должен содержать: order_id, product_name
+
+SELECT order_id, product_name
+FROM orders o
+INNER JOIN customers c
+ON o.customer_id = c.customer_id
+INNER JOIN products p
+ON o.product_id = p.product_id
+WHERE name = 'Алексей Алексеев';
+
+-- Напишите запрос, чтобы определить общую стоимость заказов для каждого клиента за весь период, 
+-- отсортированную по стоимости в убывающем порядке.
+-- Результат должен содержать:name, total_cost
+
+SELECT name, sum(price_per_unit*quantity) AS total_cost
+FROM orders o
+INNER JOIN customers c
+ON o.customer_id = c.customer_id
+INNER JOIN products p
+ON o.product_id = p.product_id
+GROUP BY o.customer_id
+ORDER BY total_cost DESC;
+
+
+-- не забываем, что есть count(distinct)
+-- с GROUP BY не используется WHERE, используется HAVING, т.к. WHERE функционирует до стадии агрегации.
+-- SELECT - выполняется в последнюю очередь
+SELECT product_name
+FROM products p
+LEFT JOIN orders o
+ON p.product_id = o.product_id
+GROUP BY product_name
+HAVING count(DISTINCT customer_id) = 1;
+
+SELECT * FROM orders;
+
+-- 1. Агрегатные оконные функции
+-- Эти функции выполняют агрегатные вычисления, но в отличие от обычных агрегатных функций,
+-- они не группируют строки, а возвращают значение для каждой строки.
+SELECT order_id, order_date, quantity,
+       SUM(quantity) OVER (PARTITION BY order_date) AS daily_total_quantity
+FROM orders;
+
+-- OVER (PARTITION BY order_date): Это и есть окно. Оно определяет набор строк, 
+-- к которому применяется агрегатная функция SUM(). 
+-- В данном случае строки разбиваются на группы (partitions) по значению столбца order_date.
+
+-- пустое окно -> окно вся таблица
+SELECT order_id, order_date, quantity,
+       SUM(quantity) OVER () AS total_quantity
+FROM orders;
+
+-- другие примеры
+SELECT order_id, order_date, quantity,
+       AVG(quantity) OVER (PARTITION BY order_date) AS daily_avg_quantity
+FROM orders;
+
+SELECT order_id, order_date, quantity,
+       COUNT(*) OVER (PARTITION BY order_date) AS daily_order_count
+FROM orders;
+
+--  2. Функции ранжирования
+-- Эти функции назначают ранг или позицию строкам в пределах окна.
+-- ROW_NUMBER(): Назначает уникальный номер каждой строке в пределах окна.
+-- Позволяет разделить на группы по признаку упорядочить по любому из признаков.
+
+-- разделили по датам и упорядочили по quantity DESC
+SELECT order_id, order_date, quantity,
+       ROW_NUMBER() OVER (PARTITION BY order_date ORDER BY quantity DESC) AS row_num
+FROM orders;
+
+--без partion просто занумерует по убыванию quantity
+SELECT order_id, order_date, quantity,
+       ROW_NUMBER() OVER (ORDER BY quantity DESC) AS row_num
+FROM orders;
+
+-- RANK(): Назначает ранг строкам с возможностью дубликатов (одинаковые значения получают одинаковый ранг,
+-- а следующая строка получает ранг с пропуском).
+-- по сути как ROW_NUMBER, но одинаковые значения получают тот же ранг 
+-- и ещё места как в спроте(если два ранга 1, то следующий - ранг 3 и т.п.)
+
+SELECT order_id, order_date, quantity,
+       RANK() OVER (PARTITION BY order_date ORDER BY quantity DESC) AS rank
+FROM orders;
+
+-- DENSE_RANK(): Назначает ранг строкам без пропусков (одинаковые значения получают одинаковый ранг,
+-- следующая строка получает следующий ранг без пропуска).
+SELECT order_id, order_date, quantity,
+       DENSE_RANK() OVER (PARTITION BY order_date ORDER BY quantity DESC) AS dense_rank
+FROM orders;
+
+--NTILE(): Разбивает строки на n примерно равных частей и назначает номер каждой части.
+--показывает в какой из n-частей упорядоченных общих данных находится запись
+SELECT order_id, order_date, quantity,
+       NTILE(3) OVER (ORDER BY order_date) AS quartile
+FROM orders;
+-- если ровно не делится начальные части чуть больше(первые m частей, где m - остаток от деления числа строк на n)
+
+-- 3. Функции смещения
+-- Эти функции позволяют получать значения из соседних строк.
+
+-- LAG(): Возвращает значение из предыдущей строки в пределах окна. 
+-- Параметры функции указываются в скобках (столбец и шаг смещения).
+SELECT order_id, order_date, quantity,
+       LAG(quantity, 1) OVER (ORDER BY order_date) AS prev_quantity
+FROM orders;
+--ссылка на предыдущее(с шагом n) значение
+
+-- LEAD(): Возвращает значение из следующей строки в пределах окна. 
+--LAG() снизу вверх.
+SELECT order_id, order_date, quantity,
+       LEAD(quantity, 1) OVER (ORDER BY order_date) AS next_quantity
+FROM orders;
+
+-- FIRST_VALUE(): Возвращает первое значение в пределах окна.
+SELECT order_id, order_date, quantity,
+       FIRST_VALUE(quantity) OVER (PARTITION BY order_date) AS first_quantity
+FROM orders;
+-- получилось в каждом окне первое значение 1
+
+-- LAST_VALUE(): Возвращает последнее значение в пределах окна.
+SELECT order_id, order_date, quantity,
+       LAST_VALUE(quantity) OVER (PARTITION BY order_date) AS first_quantity
+FROM orders;
+
+-- Функции, работающие с рамками (frames)
+-- Эти функции позволяют задавать рамку (frame) внутри окна, на которую будет распространяться вычисление. Ключевые слова ROWS и RANGE помогают определить рамку.
+
+-- ROWS BETWEEN: Устанавливает рамку на основе числа строк относительно текущей строки.
+SELECT order_id, order_date, quantity,
+       SUM(quantity) OVER (ORDER BY order_date ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS sum_around
+FROM orders;
+-- как окно в нейросетках (двойное, с центром)
+
+-- RANGE BETWEEN: Устанавливает рамку на основе значений в строках относительно текущей строки.
+SELECT order_id, order_date, quantity,
+       SUM(quantity) OVER (ORDER BY order_date RANGE BETWEEN INTERVAL '1 DAY' PRECEDING AND CURRENT ROW) AS range_sum
+FROM orders;
+
+SELECT order_id, order_date, quantity,
+       SUM(quantity) OVER (ORDER BY order_date RANGE BETWEEN INTERVAL '2 DAYS' PRECEDING AND '2 DAYS' FOLLOWING) AS range_sum
+FROM orders;
+
+SELECT order_id, order_date, quantity,
+       SUM(quantity) OVER (ORDER BY quantity RANGE BETWEEN 1 PRECEDING AND CURRENT ROW) AS range_sum
+FROM orders;
+-- позволяет выполнить агрегирующую функцию в пределах по значению столбца-аргумента(quantity)
+-- МОЖНО ВЫПОЛНЯТЬ С ДАТОЙ С ПОМОЩЬЮ INTERVAL
+
+--Ограничения при использовании оконных функций:
+-- 1. С оконными функциями DISTINCT не сработает.
+-- 2. Нельзя сочетать оконные функции с группировкой.
+-- 3. Оконные функции, как и агрегирующие функции, нельзя использовать в условиях после WHERE.
+
+-- Образец запроса SQL и порядка написания операторов. По хорошему нужно знать и уметь применять большинство из команд тут!
+SELECT [ ALL | DISTINCT [ ON ( expression [, ...] ) ] ]
+    [ * | expression [ [ AS ] output_name ] [, ...] ]
+    [ FROM from_item [, ...] ]
+    [ WHERE condition ]
+    [ GROUP BY [ ALL | DISTINCT ] grouping_element [, ...] ]
+    [ HAVING condition ]
+    [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] select ]
+    [ ORDER BY expression [ ASC | DESC | USING operator ] [ NULLS { FIRST | LAST } ] [, ...] ]
+    [ LIMIT { count | ALL } ]
+    [ OFFSET start [ ROW | ROWS ] ]
+    [ FETCH { FIRST | NEXT } [ count ] { ROW | ROWS } { ONLY | WITH TIES } ]
+    [ FOR { UPDATE | NO KEY UPDATE | SHARE | KEY SHARE } [ OF table_name [, ...] ] [ NOWAIT | SKIP LOCKED ] [...] ]
+	
+-- практика по оконным функциям(чуть-чуть)
+
+DROP TABLE IF EXISTS sales;
+CREATE TABLE sales (
+	id SERIAL PRIMARY KEY,
+	salesman_id INT,
+	amount DECIMAL(10,2),
+	sale_date DATE
+);
+
+INSERT INTO sales (salesman_id, amount, sale_date)  VALUES 
+(1, 150.00, '2024-06-01'),
+(1, 200.00, '2024-06-05'),
+(2, 300.00, '2024-06-02'),
+(2, 100.00, '2024-06-06'),
+(3, 250.00, '2024-06-01'),
+(3, 50.00, '2024-06-07'),
+(3, 300.00, '2024-06-08');
+
+SELECT id, salesman_id, amount, sale_date,
+	AVG(amount) OVER (PARTITION BY salesman_id ORDER BY sale_date) AS pupupu
+FROM sales;
+
+-- интересное наблюдение! Если написать ORDER BY, то агрегатная оконная функция работает последовательно по строке.
+-- Если же делать без ORDER BY, рассматривает группу в целом.
+SELECT order_id, order_date, quantity,
+       AVG(quantity) OVER (PARTITION BY order_date ORDER BY order_id) AS daily_avg_quantity
+FROM orders;
+
+SELECT order_id, order_date, quantity,
+       AVG(quantity) OVER (PARTITION BY order_date) AS daily_avg_quantity
+FROM orders;
+
+
+SELECT id, salesman_id, amount, sale_date,
+	ROW_NUMBER() OVER (PARTITION BY salesman_id ORDER BY sale_date) AS pupupu
+FROM sales;
+
+SELECT id, salesman_id, amount, sale_date,
+	RANK() OVER (PARTITION BY salesman_id ORDER BY sale_date) AS pupupu
+FROM sales;
+
+SELECT id, salesman_id, amount, sale_date,
+	LEAD(amount, 1) OVER (PARTITION BY salesman_id ORDER BY sale_date) AS pupupu
+FROM sales;
+
+-- Напишите запрос для размещения рейтинга заказов по общей стоимости. 
+-- Ответ должен содержать order_id,  order_rank
+SELECT order_id,
+    RANK() OVER (ORDER BY quantity*price_per_unit DESC) AS order_rank
+    
+FROM orders o
+INNER JOIN products p
+ON o.product_id = p.product_id;
+
+
+
+
+
+
+-- Немного практики на SQL-acacdemy. Буду тут писать то, что мне было не понятно / не смог решить.
+
+-- Функция TIMEDIFF - разница во времени в формате HH:MM:SS. Для дат DATEDIFF.
+SELECT town_to, TIMEDIFF(time_in, time_out)  AS flight_time
+FROM Trip
+WHERE town_from = 'Paris';
+
+-- Для временного промежутка удобно использовать слово BETWEEN
+SELECT * FROM Trip
+WHERE time_out BETWEEN '1900-01-01T10:00:00.000Z' AND '1900-01-01T14:00:00.000Z';
+
+-- Прикольная задачка. Вывести имена людей, у которых есть полный тёзка среди пассажиров
+SELECT name FROM passenger
+GROUP BY name
+HAVING count(name) > 1;
+
+-- Двойной подзапрос.
+SELECT town_to FROM Trip
+WHERE id IN 
+    (SELECT DISTINCT trip 
+    FROM Pass_in_trip 
+    WHERE passenger IN
+        (SELECT id FROM Passenger WHERE name = 'Bruce Willis'));
+        
+--Вывести отсортированный по количеству перелетов (по убыванию) и имени (по возрастанию) список пассажиров, совершивших хотя бы 1 полет. Подзапросы и ордер by, который выполняется после всех команд (после SELECT).
+SELECT name, (SELECT count(*) FROM Pass_in_trip WHERE passenger = p.id) AS count
+FROM Passenger p
+WHERE id IN (SELECT passenger FROM Pass_in_trip)
+ORDER BY count DESC, name ASC
+
+-- Решил подзапросами, наверное можно GROUP BY. (P.S. в ответах решено join-ом)
+--Определить, сколько потратил в 2005 году каждый из членов семьи. В результирующей выборке не выводите тех членов семьи, которые ничего не потратили.
+SELECT member_name, status, 
+    (SELECT sum(unit_price*amount) 
+    FROM Payments 
+    WHERE family_member = fm.member_id 
+    AND YEAR(date) = 2005) as costs
+FROM FamilyMembers fm
+WHERE member_id IN (SELECT family_member FROM Payments)
+
+-- Вывести средний возраст людей (в годах), хранящихся в базе данных. Результат округлите до целого в меньшую сторону.
+SELECT FLOOR(AVG(YEAR(NOW()) - YEAR(birthday))) AS age FROM FamilyMembers;
+
+-- РАЗНОСТЬ ДАТЫ И ВРЕМЕНИ
+-- вариант 1 timestampdiff
+SELECT TIMESTAMPDIFF(YEAR, max(birthday), NOW()) as year 
+FROM Student;
+
+-- вариант 2 (более костыльный) - FLOOR datediff - выдает разницу в днях, надо делить на 365!
+SELECT FLOOR(DATEDIFF(NOW(), '2003-07-03 14:10:26') / 365);
+
+
+
