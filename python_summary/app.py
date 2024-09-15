@@ -39,9 +39,7 @@ try:
 	total_per_product = total_sales_per_product(sales_list)
 
 	total_per_date = sales_over_time(sales_list)
-	
-	print(total_per_product)
-	print(total_per_date)
+
 	# Рассчет продукта и даты максимальной прибыли
 	top_product = max(total_per_product, key=total_per_product.get)
 	top_date = max(total_per_date, key=total_per_date.get)
