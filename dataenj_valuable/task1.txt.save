@@ -1,0 +1,38 @@
+CREATE TABLE surnames (
+	id INT PRIMARY KEY,
+	surname VARCHAR
+);
+
+CREATE TABLE names (
+	id INT PRIMARY KEY,
+	name VARCHAR
+);
+
+CREATE TABLE patrons (
+	id INT PRIMARY KEY,
+	patron VARCHAR
+);
+
+INSERT INTO surnames VALUES
+(1, 'Иванов'),
+(2, 'Петров'),
+(3, 'Сидоров');
+
+INSERT INTO names VALUES
+(1, 'Иван'),
+(2, 'Петр'),
+(3, 'Сидор');
+
+INSERT INTO patrons VALUES
+(1, 'Иванович'),
+(2, 'Петрович'),
+(3, 'Сидорович');
+
+SELECT surname, name, patron
+FROM surnames s
+JOIN names n
+ON s.id = n.id
+JOIN patrons p
+ON n.id = p.id
+ORDER BY (surname, name, patron) DESC;
+
